@@ -1,0 +1,18 @@
+## Default Elasticsearch configuration from Elasticsearch base image.
+## https://github.com/elastic/elasticsearch/blob/master/distribution/docker/src/docker/config/elasticsearch.yml
+
+#We already set cluster name in docker compose via environment veriable
+#cluster.name: "docker-cluster"
+network.host: 0.0.0.0
+http.port: 9200
+
+## X-Pack settings
+## see https://www.elastic.co/guide/en/elasticsearch/reference/current/setup-xpack.html
+
+
+## we are adding a basic password authentication on our elastic search server so if any service like kibana, 
+## beats want to tallk with elastic search they need to authenticate with the password first then communication is happend.
+## And we are seting this super user elastic password from using docker compose environment veriable "The default username is 'elastic'".
+xpack.license.self_generated.type: basic
+xpack.security.enabled: true
+xpack.monitoring.collection.enabled: true

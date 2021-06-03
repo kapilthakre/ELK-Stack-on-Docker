@@ -1,0 +1,62 @@
+version: '3'
+services:
+
+
+     #Elasticsearch container
+     elasticsearch:
+          image: docker.elastic.co/elasticsearch/elasticsearch:${ELASTIC_VERSION} 
+          container_name: elasticsearch 
+          environment:
+            - node.name=es01
+            - cluster.name=es-docker-cluster
+            - discovery.type=single-node
+             #Protect the elastic search server with the custom password and the default username is 'elastic'
+            - ELASTIC_PASSWORD=${ELASTIC_PASSWORD}
+            - bootstrap.memory_lock=true
+            - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+          ulimits:
+            memlock:
+              soft: -1
+              hard: -1  
+          volumes:
+             - ./config/elasticsearch/elasticsearch.yml:/usr/share/elasticsearch/config/elasticsearch.yml
+          ports:
+             - "9200:9200"
+          #Internal network for the containers
+          networks:
+             - elk
+
+
+
+     #Kibana container
+     kibana:
+          image: docker.elastic.co/kibana/kibana:${ELASTIC_VERSION}
+          container_name: kibana
+          volumes:
+            - ./config/kibana/kibana.yml:/usr/share/kibana/config/kibana.yml
+        # ports:
+        #    - "5601:5601"
+          networks:
+            - elk
+          depends_on:
+            - "elasticsearch"
+
+    
+     nginx:
+         image: nginx
+         container_name: nginx
+         volumes:
+           - ./config/nginx/conf.d:/etc/nginx/conf.d
+         ports:
+           - "80:80"
+         networks:
+           - elk
+         depends_on:
+           - "elasticsearch"
+           - "kibana"
+
+
+networks:
+  elk:
+    driver: bridge
+                                 
