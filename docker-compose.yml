@@ -41,7 +41,7 @@ services:
           depends_on:
             - "elasticsearch"
 
-    
+    #Nginx container
      nginx:
          image: nginx
          container_name: nginx
