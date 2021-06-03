@@ -1,0 +1,25 @@
+#This compose is design in a such way that it's sends all running container logs to the elastic search directly. 
+#If you want to send all your filebeat logs to logsatsh then logstash pass that logs  to the elastic search server we will desighn that type of setup in future.
+
+version: '3'
+services:
+     fileabeat:
+         image: docker.elastic.co/beats/filebeat:7.13.0
+         container_name: filebeat
+         #restart: on-failure
+         user: root
+         volumes:
+            #Mount the filebeat configuration so users can make edit
+            - ./config/filebeat/filebeat.docker.yml:/usr/share/filebeat/filebeat.yml:ro
+
+            #This is needed for filebeat to load container log path as specified in filebeat.yml
+            - /var/lib/docker/containers:/var/lib/docker/containers:ro
+
+            #This bassicaly helps to send all containers logs to elastic search
+            - /var/run/docker.sock:/var/run/docker.sock:ro
+
+            #This is used to store all filbeat data. do not creat this folder manualy
+            #This is used to persist registry file between restarts, so to avoid data duplication
+            - ./filebeat_data:/usr/share/filebeat/data/
+
+         command: filebeat -e -strict.perms=false
