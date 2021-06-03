@@ -1,0 +1,23 @@
+filebeat.config:
+  modules:
+    path: ${path.config}/modules.d/*.yml
+    reload.enabled: false
+
+filebeat.autodiscover:
+  providers:
+    - type: docker
+      hints.enabled: true
+
+processors:
+- add_cloud_metadata: ~
+
+# we need to specify where our kibana and elasticsearch server are running so that this filebeat container can talk to them 
+# elastic search is running on different server so Im entering that server ip
+
+output.elasticsearch:
+  # put your elastic search server ip address
+  hosts: '${ELASTICSEARCH_HOSTS:3.128.74.201:9200}'
+
+# Enter your elastic search server username and password. If you did not set any password on elastic search then uncomment this
+  username: '${ELASTICSEARCH_USERNAME:elastic}'
+  password: '${ELASTICSEARCH_PASSWORD:anypass}'
